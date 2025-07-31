@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { TaskListContext } from '../../context/taskListContext';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useForm } from '../../hooks/useForm';
 
-const initialTaskListForm = {
+let initialTaskListForm = {
   title: '',
   description: '',
   completed: false
@@ -11,45 +12,45 @@ const initialTaskListForm = {
 export const EditTaskList = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const { taskList, editTaskList } = useContext(TaskListContext);
 
-  const [taskListForm, setTaskListForm] = useState(initialTaskListForm);
-
   useEffect(() => {
-    const numericId = Number(id);
-    const taskEdit = taskList.find(tl => tl.id === numericId);
+    const taskEdit = taskList.find(tl => tl.id === id);
 
     if (taskEdit) {
-      setTaskListForm({
+      initialTaskListForm = {
         title: taskEdit.title,
         description: taskEdit.description,
         completed: taskEdit.completed
-      });
+      };
     } else {
-      console.log(`No task found with id: ${id}`);
       navigate('/tareas');
     }
   }, [id, taskList, navigate]);
 
-  const onChangeInput = ({ target }) => {
-    const { name, value } = target;
+  const { title, description, completed, onChangeInput } = useForm(initialTaskListForm);
 
-    setTaskListForm(prev => ({
-      ...prev,
-      [name]: (name === 'completed' ? !taskListForm.completed : value)
-    }));
-  };
+  const onChangeInputCheckbox = ({ target }) => {
+    const { name, checked } = target;
+    onChangeInput({ target: { name, value: checked } });
+  }
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (!taskListForm.title || !taskListForm.description) {
+    if (!title || !description) {
       alert('Por favor, completa todos los campos.');
       return;
     }
-    console.log(`Editing task with id: ${id}`, taskListForm);
 
-    taskListForm.updatedAt = new Date().toISOString()
-    editTaskList(Number(id), taskListForm);
+    const taskListSave = {
+      title,
+      description,
+      completed,
+      updatedAt: new Date().toISOString()
+    };
+
+    editTaskList(id, taskListSave);
     navigate('/tareas');
   };
 
@@ -58,7 +59,7 @@ export const EditTaskList = () => {
       <div className="card shadow-lg border-0">
         <div className="card-header bg-gradient-primary py-3">
           <h2 className="card-title mb-0">
-            <i className="bi bi-list-check me-2"></i>Editar Lista de Tareas
+            <i className="bi bi-list-check me-2"></i>Editar una Lista de Tareas
           </h2>
         </div>
         <div className="card-body p-4">
@@ -74,7 +75,7 @@ export const EditTaskList = () => {
                 className="form-control form-control-lg rounded-pill border-primary shadow-sm"
                 placeholder="Ingresa el título"
                 name="title"
-                value={taskListForm.title}
+                value={title}
                 onChange={onChangeInput}
                 required
               />
@@ -91,7 +92,7 @@ export const EditTaskList = () => {
                 name="description"
                 rows="5"
                 placeholder="Describe tu lista de tareas"
-                value={taskListForm.description}
+                value={description}
                 onChange={onChangeInput}
                 required
               />
@@ -104,8 +105,8 @@ export const EditTaskList = () => {
                 type="checkbox"
                 id="completed"
                 name="completed"
-                checked={taskListForm.completed}
-                onChange={onChangeInput}
+                checked={completed}
+                onChange={onChangeInputCheckbox}
               />
               <label className="form-check-label fw-semibold" htmlFor="completed">
                 <i className="bi bi-check2-circle me-1"></i> Marcada como completada

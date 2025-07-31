@@ -2,37 +2,10 @@ import { useReducer } from "react";
 import { TaskListContext } from "./taskListContext";
 
 const initialState = [{
-  id: 1,
-  tasks: [{
-    id: 1,
-    title: "Sample Task 1",
-    description: "This is sample task description.",
-  },
-  {
-    id: 2,
-    title: "Sample Task 2",
-    description: "This is another sample task description.",
-  }],
-  title: "Sample Task List",
-  description: "This is a sample task description. This is sample task description. This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.This is sample task description.",
-  completed: false,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-},
-{
-  id: 2,
-  tasks: [{
-    id: 1,
-    title: "Sample Task 1",
-    description: "This is sample task description.",
-  },
-  {
-    id: 2,
-    title: "Sample Task 2",
-    description: "This is another sample task description.",
-  }],
-  title: "Sample Task List",
-  description: "This is a sample task description.",
+  id: new Date().toISOString(),
+  tasks: [],
+  title: '',
+  description: '',
   completed: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
@@ -42,14 +15,11 @@ export const TaskListProvider = ({ children }) => {
   const taskListReducer = (state, action) => {
     switch (action.type) {
       case 'ADD_TASK_LIST':
-        // simplemente concatenas la nueva lista
         return [
           ...state,
           action.payload
         ];
-
       case 'EDIT_TASK_LIST':
-        // mapeas sobre el array y reemplazas solo el elemento editado
         return state.map(list =>
           list.id === action.payload.id
             ? { ...list, ...action.payload.updatedTask }

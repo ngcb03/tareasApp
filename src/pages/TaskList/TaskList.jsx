@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 
 export const TaskList = () => {
 
-  const { taskList } = useContext(TaskListContext)
+  const { taskList, removeTaskList } = useContext(TaskListContext)
 
   return (
     <div className="m-3">
@@ -52,10 +52,16 @@ export const TaskList = () => {
               <div className="d-flex flex-wrap gap-2 justify-content-end" role="group">
                 <Link
                   to={`/tareas/${tl.id}/editar`}
-                  className="btn btn-warning" >
+                  className="btn btn-warning"
+                  title='Editar Lista de Tareas'
+                >
                   <i className="bi bi-pencil-fill me-1"></i> Editar
                 </Link>
-                <button className="btn btn-danger">
+                <button
+                  className="btn btn-danger"
+                  onClick={() => removeTaskList(tl.id)}
+                  title='Eliminar Lista de Tareas'
+                >
                   <i className="bi bi-trash-fill me-1"></i> Eliminar
                 </button>
               </div>
