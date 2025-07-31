@@ -1,5 +1,5 @@
-import { useReducer } from "react"
-import { TaskListContext } from "./taskListContext"
+import { useReducer } from "react";
+import { TaskListContext } from "./taskListContext";
 
 const initialState = [{
   id: 1,
@@ -39,48 +39,46 @@ const initialState = [{
 }]
 
 export const TaskListProvider = ({ children }) => {
-
   const taskListReducer = (state, action) => {
     switch (action.type) {
       case 'ADD_TASK_LIST':
-        return {
+        // simplemente concatenas la nueva lista
+        return [
           ...state,
-          tasks: [...state.tasks, action.payload],
-        }
+          action.payload
+        ];
+
       case 'EDIT_TASK_LIST':
-        return {
-          ...state,
-          tasks: state.tasks.map(task =>
-            task.id === action.payload.id ? { ...task, ...action.payload.updatedTask } : task
-          ),
-        }
+        // mapeas sobre el array y reemplazas solo el elemento editado
+        return state.map(list =>
+          list.id === action.payload.id
+            ? { ...list, ...action.payload.updatedTask }
+            : list
+        );
+
       case 'REMOVE_TASK_LIST':
-        return {
-          ...state,
-          tasks: state.tasks.filter(task => task.id !== action.payload.id),
-        }
+        // filtras sacando la que tenga el id
+        return state.filter(list => list.id !== action.payload.id);
+
       default:
-        return state
+        return state;
     }
-  }
+  };
 
-  const [taskList, dispatch] = useReducer(taskListReducer, initialState)
+  const [taskList, dispatch] = useReducer(taskListReducer, initialState);
 
-  const addTaskList = (task) => {
-    dispatch({ type: 'ADD_TASK_LIST', payload: task })
-  }
+  const addTaskList = task =>
+    dispatch({ type: 'ADD_TASK_LIST', payload: task });
 
-  const editTaskList = (taskId, updatedTask) => {
-    dispatch({ type: 'EDIT_TASK_LIST', payload: { id: taskId, updatedTask } })
-  }
+  const editTaskList = (taskId, updatedTask) =>
+    dispatch({ type: 'EDIT_TASK_LIST', payload: { id: taskId, updatedTask } });
 
-  const removeTaskList = (taskId) => {
-    dispatch({ type: 'REMOVE_TASK_LIST', payload: { id: taskId } })
-  }
+  const removeTaskList = taskId =>
+    dispatch({ type: 'REMOVE_TASK_LIST', payload: { id: taskId } });
 
   return (
     <TaskListContext.Provider value={{ taskList, addTaskList, editTaskList, removeTaskList }}>
       {children}
     </TaskListContext.Provider>
-  )
-}
+  );
+};
